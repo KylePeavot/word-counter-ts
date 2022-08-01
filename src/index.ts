@@ -1,5 +1,5 @@
-import {ExportToCsv} from 'export-to-csv';
 import textTranscripts from './resources/text-transcripts.json';
+import fs from 'fs';
 
 type Transcript = {
     url: string;
@@ -33,18 +33,15 @@ function run() {
         }
     });
 
-    const sortedWordsInTranscriptAsCSV: {word: string; count: number}[] = [
+    const sortedWordsInTranscriptAsCSV: string = [
         ...wordsInTranscriptHashMap.entries(),
     ]
         .sort((firstWord, secondWord) => firstWord[1] - secondWord[1])
-        .map(sortedWord => ({word: sortedWord[0], count: sortedWord[1]}));
+        .map(sortedWord => `${sortedWord[0]}; ${sortedWord[1]}`)
+        .join('\n');
 
-    const csvExporter = new ExportToCsv({
-        filename: `sorted-spanish-words-${new Date().toISOString()}`,
-        headers: ['Word', 'Count'],
-    });
 
-    csvExporter.generateCsv(sortedWordsInTranscriptAsCSV);
+    fs.writeFile(`most-common-spanish-words-${new Date().toISOString()}.csv`, sortedWordsInTranscriptAsCSV, () => {});
 }
 
 run();
